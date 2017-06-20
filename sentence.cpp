@@ -276,47 +276,7 @@ static double func_pct(const std::vector<Variant *> & vec)
 	return is_void(n) || is_void(n1) || n1 == 0.0 ? VOID_NUM : n * 100 / n1;
 }
 
-sentence::sentence()
-{
-	_const_map.insert(std::make_pair("true", variant_value(TRUE_NUM)));
-	_const_map.insert(std::make_pair("false", variant_value(FALSE_NUM)));
-	_const_map.insert(std::make_pair("pi", variant_value(3.14159265358979323846)));
-	_const_map.insert(std::make_pair("e", variant_value(2.71828182845904523536)));
-	_func_map.insert(std::make_pair("or", variant_function(T_NUM_OPER, 2, func_or)));
-	_func_map.insert(std::make_pair("and", variant_function(T_NUM_OPER, 2, func_and)));
-	_func_map.insert(std::make_pair("not", variant_function(T_NUM_OPER, 1, func_not)));
-	_func_map.insert(std::make_pair("eq", variant_function(T_NUM_OPER, -1, func_eq)));
-	_func_map.insert(std::make_pair("ne", variant_function(T_NUM_OPER, -1, func_ne)));
-	_func_map.insert(std::make_pair("gt", variant_function(T_NUM_OPER, -1, func_gt)));
-	_func_map.insert(std::make_pair("lt", variant_function(T_NUM_OPER, -1, func_lt)));
-	_func_map.insert(std::make_pair("ge", variant_function(T_NUM_OPER, -1, func_ge)));
-	_func_map.insert(std::make_pair("le", variant_function(T_NUM_OPER, -1, func_le)));
-	_func_map.insert(std::make_pair("match", variant_function(T_NUM_OPER, -1, func_match)));
-	_func_map.insert(std::make_pair("mismatch", variant_function(T_NUM_OPER, -1, func_mismatch)));
-	_func_map.insert(std::make_pair("begin", variant_function(T_NUM_OPER, -1, func_begin)));
-	_func_map.insert(std::make_pair("end", variant_function(T_NUM_OPER, -1, func_end)));
-	_func_map.insert(std::make_pair("part", variant_function(T_NUM_OPER, -1, func_part)));
-	_func_map.insert(std::make_pair("add", variant_function(T_NUM_OPER, 2, func_add)));
-	_func_map.insert(std::make_pair("sub", variant_function(T_NUM_OPER, 2, func_sub)));
-	_func_map.insert(std::make_pair("neg", variant_function(T_NUM_OPER, 1, func_neg)));
-	_func_map.insert(std::make_pair("mul", variant_function(T_NUM_OPER, 2, func_mul)));
-	_func_map.insert(std::make_pair("div", variant_function(T_NUM_OPER, 2, func_div)));
-	_func_map.insert(std::make_pair("mod", variant_function(T_NUM_OPER, 2, func_mod)));
-	_func_map.insert(std::make_pair("pos", variant_function(T_STR_OPER, 1, func_pos)));
-	_func_map.insert(std::make_pair("first", variant_function(T_STR_OPER, 1, func_first)));
-	_func_map.insert(std::make_pair("len", variant_function(T_NUM_FUNC, 1, func_len)));
-	_func_map.insert(std::make_pair("abs", variant_function(T_NUM_FUNC, 1, func_abs)));
-	_func_map.insert(std::make_pair("exp", variant_function(T_NUM_FUNC, 1, func_exp)));
-	_func_map.insert(std::make_pair("fac", variant_function(T_NUM_FUNC, 1, func_fac)));
-	_func_map.insert(std::make_pair("logd", variant_function(T_NUM_FUNC, 1, func_logd)));
-	_func_map.insert(std::make_pair("logn", variant_function(T_NUM_FUNC, 1, func_logn)));
-	_func_map.insert(std::make_pair("max", variant_function(T_NUM_FUNC, -1, func_max)));
-	_func_map.insert(std::make_pair("min", variant_function(T_NUM_FUNC, -1, func_min)));
-	_func_map.insert(std::make_pair("pct", variant_function(T_NUM_FUNC, 2, func_pct)));
-	_func_map.insert(std::make_pair("pow", variant_function(T_NUM_FUNC, 2, func_pow)));
-	_func_map.insert(std::make_pair("root", variant_function(T_NUM_FUNC, 2, func_root)));
-	_func_map.insert(std::make_pair("sqrt", variant_function(T_NUM_FUNC, 1, func_sqrt)));
-}
+sentence::sentence() {}
 
 sentence::~sentence() {}
 
@@ -360,6 +320,54 @@ sentence & sentence::set(const char * name, const char * s)
 	return *this;
 }
 
+sentence & sentence::reset()
+{
+	_const_map.clear();
+	_func_map.clear();
+	_var_map.clear();
+	_str_map.clear();
+	_root.reset();
+	_const_map.insert(std::make_pair("true", variant_value(TRUE_NUM)));
+	_const_map.insert(std::make_pair("false", variant_value(FALSE_NUM)));
+	_const_map.insert(std::make_pair("pi", variant_value(3.14159265358979323846)));
+	_const_map.insert(std::make_pair("e", variant_value(2.71828182845904523536)));
+	_func_map.insert(std::make_pair("or", variant_function(T_NUM_OPER, 2, func_or)));
+	_func_map.insert(std::make_pair("and", variant_function(T_NUM_OPER, 2, func_and)));
+	_func_map.insert(std::make_pair("not", variant_function(T_NUM_OPER, 1, func_not)));
+	_func_map.insert(std::make_pair("eq", variant_function(T_NUM_OPER, -1, func_eq)));
+	_func_map.insert(std::make_pair("ne", variant_function(T_NUM_OPER, -1, func_ne)));
+	_func_map.insert(std::make_pair("gt", variant_function(T_NUM_OPER, -1, func_gt)));
+	_func_map.insert(std::make_pair("lt", variant_function(T_NUM_OPER, -1, func_lt)));
+	_func_map.insert(std::make_pair("ge", variant_function(T_NUM_OPER, -1, func_ge)));
+	_func_map.insert(std::make_pair("le", variant_function(T_NUM_OPER, -1, func_le)));
+	_func_map.insert(std::make_pair("match", variant_function(T_NUM_OPER, -1, func_match)));
+	_func_map.insert(std::make_pair("mismatch", variant_function(T_NUM_OPER, -1, func_mismatch)));
+	_func_map.insert(std::make_pair("begin", variant_function(T_NUM_OPER, -1, func_begin)));
+	_func_map.insert(std::make_pair("end", variant_function(T_NUM_OPER, -1, func_end)));
+	_func_map.insert(std::make_pair("part", variant_function(T_NUM_OPER, -1, func_part)));
+	_func_map.insert(std::make_pair("add", variant_function(T_NUM_OPER, 2, func_add)));
+	_func_map.insert(std::make_pair("sub", variant_function(T_NUM_OPER, 2, func_sub)));
+	_func_map.insert(std::make_pair("neg", variant_function(T_NUM_OPER, 1, func_neg)));
+	_func_map.insert(std::make_pair("mul", variant_function(T_NUM_OPER, 2, func_mul)));
+	_func_map.insert(std::make_pair("div", variant_function(T_NUM_OPER, 2, func_div)));
+	_func_map.insert(std::make_pair("mod", variant_function(T_NUM_OPER, 2, func_mod)));
+	_func_map.insert(std::make_pair("pos", variant_function(T_STR_OPER, 1, func_pos)));
+	_func_map.insert(std::make_pair("first", variant_function(T_STR_OPER, 1, func_first)));
+	_func_map.insert(std::make_pair("len", variant_function(T_NUM_FUNC, 1, func_len)));
+	_func_map.insert(std::make_pair("abs", variant_function(T_NUM_FUNC, 1, func_abs)));
+	_func_map.insert(std::make_pair("exp", variant_function(T_NUM_FUNC, 1, func_exp)));
+	_func_map.insert(std::make_pair("fac", variant_function(T_NUM_FUNC, 1, func_fac)));
+	_func_map.insert(std::make_pair("logd", variant_function(T_NUM_FUNC, 1, func_logd)));
+	_func_map.insert(std::make_pair("logn", variant_function(T_NUM_FUNC, 1, func_logn)));
+	_func_map.insert(std::make_pair("max", variant_function(T_NUM_FUNC, -1, func_max)));
+	_func_map.insert(std::make_pair("min", variant_function(T_NUM_FUNC, -1, func_min)));
+	_func_map.insert(std::make_pair("pct", variant_function(T_NUM_FUNC, 2, func_pct)));
+	_func_map.insert(std::make_pair("pow", variant_function(T_NUM_FUNC, 2, func_pow)));
+	_func_map.insert(std::make_pair("root", variant_function(T_NUM_FUNC, 2, func_root)));
+	_func_map.insert(std::make_pair("sqrt", variant_function(T_NUM_FUNC, 1, func_sqrt)));
+	return *this;
+}
+
 const char * sentence::parse(const char * expr)
 {
 	state s;
@@ -369,13 +377,6 @@ const char * sentence::parse(const char * expr)
 		return s._token;
 	_root->trim();
 	return NULL; // success
-}
-
-void sentence::reset()
-{
-	_var_map.clear();
-	_str_map.clear();
-	_root.reset();
 }
 
 double sentence::evaluate() const
