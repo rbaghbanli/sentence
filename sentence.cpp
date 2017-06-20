@@ -309,7 +309,7 @@ sentence & sentence::define(const char * cn, const char * s)
 
 sentence & sentence::set(const char * name, double n)
 {
-	auto v = variable(name);
+	auto v = variable(intern(name));
 	v->_type = T_NUM;
 	v->_num = n;
 	return *this;
@@ -317,7 +317,7 @@ sentence & sentence::set(const char * name, double n)
 
 sentence & sentence::set(const char * name, const char * s)
 {
-	auto v = variable(name);
+	auto v = variable(intern(name));
 	v->_type = T_STR;
 	v->_str = s;
 	return *this;
@@ -397,9 +397,9 @@ const char * sentence::evaluate(std::string & ret) const
 	return s;
 }
 
-variant_value * variable(const char * name)
+sentence::variant_value * sentence::variable(const char * name)
 {
-	auto & var = _var_map[id];
+	auto & var = _var_map[name];
 	if (!var)
 		var.reset(new variant_value());
 	return var.get();
