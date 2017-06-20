@@ -28,6 +28,7 @@ struct sentence
 	sentence & define(const char * cn, const char * s); // define custom constant
 	sentence & set(const char * vn, double n); // set variable
 	sentence & set(const char * vn, const char * s); // set variable
+	sentence & reset(); // reset parser and variables
 	const char* parse(const char * expr); // parse expression string, return pointer to error on failure, NULL on success
 	double evaluate() const; // evaluate result as a number
 	const char * evaluate(std::string & ret) const; // evaluate result as a string
@@ -95,8 +96,8 @@ protected:
 	std::map<const char *, std::shared_ptr<variant_value>, identifier_comparator> _var_map;
 	std::vector<std::shared_ptr<std::vector<char>>> _str_vec;
 
-	const char * str(const char * begin, const char * end);
-	variant_value * var(const char* name);
+	const char * intern(const char * begin, const char * end);
+	variant_value * variable(const char* name);
 	state & next(state & s);
 	node * disj(state & s);
 	node * conj(state & s);
