@@ -7,28 +7,17 @@ const double FALSE_NUM = 0.0;
 const double VOID_NUM = std::numeric_limits<double>::quiet_NaN();
 const char * VOID_STR = NULL;
 
-inline bool is_void(double n) { return n != n; }
-inline bool is_void(const char * s) { return s == VOID_STR; }
+static inline bool is_void(double n) { return n != n; }
 
-static inline bool alpha(char c)
-{
-	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_');
-}
+static inline bool is_void(const char * s) { return s == VOID_STR; }
 
-static inline bool numeric(char c)
-{
-	return (c >= '0' && c <= '9') || (c == '.');
-}
+static inline bool alpha(char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_'); }
 
-static inline bool alphanumeric(char c)
-{
-	return alpha(c) || numeric(c);
-}
+static inline bool numeric(char c) { return (c >= '0' && c <= '9') || (c == '.'); }
 
-static inline bool character(char c)
-{
-	return c && c != '\"';
-}
+static inline bool alphanumeric(char c) { return alpha(c) || numeric(c); }
+
+static inline bool character(char c) { return c && c != '\"'; }
 
 static double func_or(const std::vector<Variant *> & vec)
 {
@@ -276,10 +265,7 @@ static double func_pct(const std::vector<Variant *> & vec)
 	return is_void(n) || is_void(n1) || n1 == 0.0 ? VOID_NUM : n * 100 / n1;
 }
 
-sentence::sentence()
-{
-	reset();
-}
+sentence::sentence() { reset(); }
 
 sentence::~sentence() {}
 
