@@ -276,7 +276,10 @@ static double func_pct(const std::vector<Variant *> & vec)
 	return is_void(n) || is_void(n1) || n1 == 0.0 ? VOID_NUM : n * 100 / n1;
 }
 
-sentence::sentence() {}
+sentence::sentence()
+{
+	reset();
+}
 
 sentence::~sentence() {}
 
