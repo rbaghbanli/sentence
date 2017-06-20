@@ -27,92 +27,6 @@ static inline bool character(char c)
 	return c && c != '\"';
 }
 
-#pragma warning(push)
-#pragma warning(disable: 4706)
-
-int compare_identifiers(const char * s1, const char * s2)
-{
-	int diff = 0;
-	bool c1 = c1 = alpha(*s1), c2 = alpha(*s2);
-	while (c1 && c2 && !(diff = *(unsigned char *)s1 - *(unsigned char *)s2))
-	{
-		c1 = alphanumeric(*++s1); c2 = alphanumeric(*++s2);
-	}
-	if (c1 && c2)
-		return diff;
-	if (c1 != c2)
-		return c1 ? 1 : -1;
-	return 0;
-}
-
-int compare_strings(const char * s1, const char * s2)
-{
-	int diff = 0;
-	bool c1 = character(*s1), c2 = character(*s2);
-	while (c1 && c2 && !(diff = *(unsigned char *)s1 - *(unsigned char *)s2))
-	{
-		c1 = character(*++s1); c2 = character(*++s2);
-	}
-	if (c1 && c2)
-		return diff;
-	if (c1 != c2)
-		return c1 ? 1 : -1;
-	return 0;
-}
-
-bool string_begins(const char * s1, const char * s2)
-{
-	const char * w1 = s1;
-	const char * w2 = s2;
-	while (character(*w1) && character(*w2) && *w1 == *w2)
-		++w1, ++w2;
-	if (!character(*w2))
-		return true;
-	return false;
-}
-
-bool string_ends(const char * s1, const char * s2)
-{
-	const char *str1 = s1;
-	while (character(*str1))
-	{
-		const char * w1 = str1;
-		const char * w2 = s2;
-		while (character(*w1) && character(*w2) && *w1 == *w2)
-			++w1, ++w2;
-		if (!character(*w2))
-			return !character(*w1);
-		++str1;
-	}
-	return false;
-}
-
-size_t size_string(const char * s)
-{
-	const char * w = s;
-	while (character(*w))
-		++w;
-	return (size_t)(w - s);
-}
-
-int find_string(const char * s1, const char * s2)
-{
-	const char * str1 = s1;
-	while (character(*str1))
-	{
-		const char * w1 = str1;
-		const char * w2 = s2;
-		while (character(*w1) && character(*w2) && *w1 == *w2)
-			++w1, ++w2;
-		if (!character(*w2))
-			return str1 - s1;
-		++str1;
-	}
-	return -1;
-}
-
-#pragma warning(pop)
-
 static double func_or(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num(), n1 = vec[1]->num();
@@ -139,9 +53,7 @@ static double func_eq(const std::vector<variant *> & vec)
 	for (size_t i = 1; i < vec.size(); ++i)
 	{
 		double ni = vec[i]->num();
-		if (ni == VOID_NUM)
-			return VOID_NUM;
-		if (n == ni)
+		if (ni != VOID_NUM && n == ni)
 			return TRUE_NUM;
 	}
 	return FALSE_NUM;
@@ -149,18 +61,8 @@ static double func_eq(const std::vector<variant *> & vec)
 
 static double func_ne(const std::vector<variant *> & vec)
 {
-	double n = vec[0]->num();
-	if (n == VOID_NUM)
-		return VOID_NUM;
-	for (size_t i = 1; i < vec.size(); ++i)
-	{
-		double ni = vec[i]->num();
-		if (ni == VOID_NUM)
-			return VOID_NUM;
-		if (n == ni)
-			return FALSE_NUM;
-	}
-	return TRUE_NUM;
+	double n = func_eq(vec);
+	return n == VOID_NUM ? VOID_NUM : n == FALSE_NUM ? TRUE_NUM : FALSE_NUM;
 }
 
 static double func_gt(const std::vector<variant *> & vec)
@@ -195,30 +97,16 @@ static double func_match(const std::vector<variant *> & vec)
 	for (size_t i = 1; i < vec.size(); ++i)
 	{
 		const char * si = vec[i]->str();
-		if (s == VOID_STR)
-			return VOID_NUM;
-		else
-			if (!compare_strings(s, si))
-				return TRUE_NUM;
+		if (si != VOID_STR && !strcmp(s, si))
+			return TRUE_NUM;
 	}
 	return FALSE_NUM;
 }
 
 static double func_mismatch(const std::vector<variant *> & vec)
 {
-	const char * s = vec[0]->str();
-	if (s == VOID_STR)
-		return VOID_NUM;
-	for (size_t i = 1; i < vec.size(); ++i)
-	{
-		const char * si = vec[i]->str();
-		if (s == VOID_STR)
-			return VOID_NUM;
-		else
-			if (!compare_strings(s, si))
-				return FALSE_NUM;
-	}
-	return TRUE_NUM;
+	double n = func_match(vec);
+	return n == VOID_NUM ? VOID_NUM : n == FALSE_NUM ? TRUE_NUM : FALSE_NUM;
 }
 
 static double func_begin(const std::vector<variant *> & vec)
@@ -229,11 +117,8 @@ static double func_begin(const std::vector<variant *> & vec)
 	for (size_t i = 1; i < vec.size(); ++i)
 	{
 		const char * si = vec[i]->str();
-		if (s == VOID_STR)
-			return VOID_NUM;
-		else
-			if (string_begins(si, s))
-				return TRUE_NUM;
+		if (si != VOID_STR && si == strstr(si, s))
+			return TRUE_NUM;
 	}
 	return FALSE_NUM;
 }
@@ -246,11 +131,8 @@ static double func_end(const std::vector<variant *> & vec)
 	for (size_t i = 1; i < vec.size(); ++i)
 	{
 		const char * si = vec[i]->str();
-		if (s == VOID_STR)
-			return VOID_NUM;
-		else
-			if (string_ends(si, s))
-				return TRUE_NUM;
+		if (si != VOID_STR && (si + strlen(s)) == strstr(si, s))
+			return TRUE_NUM;
 	}
 	return FALSE_NUM;
 }
@@ -263,11 +145,8 @@ static double func_part(const std::vector<variant *> & vec)
 	for (size_t i = 1; i < vec.size(); ++i)
 	{
 		const char * si = vec[i]->str();
-		if (!si)
-			return VOID_NUM;
-		else
-			if (find_string(si, s) >= 0)
-				return TRUE_NUM;
+		if (si != VOID_STR && strstr(si, s))
+			return TRUE_NUM;
 	}
 	return FALSE_NUM;
 }
@@ -288,7 +167,7 @@ static const char * func_pos(const std::vector<variant *> & vec)
 {
 	const char * s = vec[0]->str();
 	double n = vec[1]->num();
-	return s == VOID_STR || n == VOID_NUM || n >= size_string(s) ? VOID_STR : (s + (size_t)n);
+	return s == VOID_STR || n == VOID_NUM || n >= strlen(s) ? VOID_STR : (s + (size_t)n);
 }
 
 static const char * func_first(const std::vector<variant *> & vec)
@@ -296,14 +175,14 @@ static const char * func_first(const std::vector<variant *> & vec)
 	const char * s = vec[0]->str(), *s1 = vec[1]->str();
 	if (s == VOID_STR || s1 == VOID_STR)
 		return VOID_STR;
-	int pos = find_string(s, s1);
-	return pos < 0 ? VOID_STR : (s + (size_t)pos);
+	const char * str = strstr(s, s1);
+	return str ? str : VOID_STR;
 }
 
 static double func_len(const std::vector<variant *> & vec)
 {
 	const char * s = vec[0]->str();
-	return s == VOID_STR ? VOID_NUM : size_string(s);
+	return s == VOID_STR ? VOID_NUM : strlen(s);
 }
 
 static double func_abs(const std::vector<variant *> & vec) { return fabs(vec[0]->num()); }
@@ -426,14 +305,21 @@ sentence::sentence()
 
 sentence::~sentence() {}
 
+const char * sentence::str(const char * begin, const char * end)
+{
+	std::vector<char> * v = new std::vector<char>(begin, end);
+	v->push_back(0);
+	_str_vec.push_back(std::shared_ptr<std::vector<char>>(v));
+	return v->data();
+}
+
 sentence::variant_value * sentence::var(const char * name)
 {
 	std::shared_ptr<variant_value>& ptr = _var_map[name];
 	variant_value * var = ptr.get();
 	if (nullptr != var)
 		return var;
-	std::shared_ptr<variant_value> nptr = std::make_shared<variant_value>();
-	ptr.swap(nptr);
+	ptr.reset(new variant_value());
 	return ptr.get();
 }
 
@@ -479,6 +365,8 @@ sentence & sentence::set(const char * name, const char * s)
 
 const char * sentence::parse(const char * expr)
 {
+	_var_map.clear();
+	_str_vec.clear();
 	state s;
 	s._token = s._next = expr;
 	_root.reset(disj(next(s)));
@@ -499,7 +387,7 @@ const char * sentence::evaluate(std::string & ret) const
 	if (s == VOID_STR)
 		ret.assign("");
 	else
-		s = ret.assign(s, size_string(s)).c_str();
+		s = ret.assign(s).c_str();
 	return s;
 }
 
@@ -519,7 +407,8 @@ sentence::state & sentence::next(sentence::state& s)
 		{ // if alpha advance next position, then try to return variable, function, number or string
 			while (alphanumeric(*s._next))
 				++s._next;  // advance next position
-			auto cp = _const_map.find(s._token);
+			const char * id = str(s._token, s._next);
+			auto cp = _const_map.find(id);
 			if (cp != _const_map.end())
 			{
 				s._type = cp->second._type;
@@ -530,7 +419,7 @@ sentence::state & sentence::next(sentence::state& s)
 				}
 				return s; // with advanced next position
 			}
-			auto fp = _func_map.find(s._token);
+			auto fp = _func_map.find(id);
 			if (fp != _func_map.end())
 			{
 				s._type = fp->second._type;
@@ -543,12 +432,12 @@ sentence::state & sentence::next(sentence::state& s)
 				return s; // with advanced next position
 			}
 			s._type = T_VAR;
-			s._var = var(s._token);
+			s._var = var(id);
 			return s; // with advanced next position
 		}
 		switch (*s._token)
 		{
-		case '\"': s._type = T_STR; s._str = ++s._next; while (character(*s._next)) ++s._next; break;
+		case '\"': s._type = T_STR; while (character(*++s._next)); s._str = str(s._token + 1, s._next); break;
 		case ' ': case '\t': case '\n': case '\r': break;
 		case '(': s._type = T_OPEN; break;
 		case ')': s._type = T_CLOSE; break;
@@ -862,4 +751,4 @@ const char * sentence::node::str() const
 	return VOID_STR;
 }
 
-bool sentence::identifier_comparator::operator() (const char * s1, const char * s2) const { return compare_identifiers(s1, s2) < 0; }
+bool sentence::identifier_comparator::operator() (const char * s1, const char * s2) const { return strcmp(s1, s2) < 0; }

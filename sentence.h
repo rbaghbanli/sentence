@@ -90,10 +90,12 @@ protected:
 	struct identifier_comparator : public std::binary_function<const char*, const char*, bool> { bool operator() (const char* s1, const char* s2) const; };
 
 	std::shared_ptr<node> _root;
-	std::map<const char*, variant_value, identifier_comparator> _const_map;
-	std::map<const char*, variant_function, identifier_comparator> _func_map;
-	std::map<const char*, std::shared_ptr<variant_value>, identifier_comparator> _var_map;
+	std::map<const char *, variant_value, identifier_comparator> _const_map;
+	std::map<const char *, variant_function, identifier_comparator> _func_map;
+	std::map<const char *, std::shared_ptr<variant_value>, identifier_comparator> _var_map;
+	std::vector<std::shared_ptr<std::vector<char>>> _str_vec;
 
+	const char * str(const char * begin, const char * end);
 	variant_value * var(const char* name);
 	state & next(state & s);
 	node * disj(state & s);
