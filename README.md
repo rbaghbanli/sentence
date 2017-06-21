@@ -40,7 +40,7 @@ variadic: match (\~, "match"), mismatch (!\~, "mismatch"),
 unary: negation (!, "not");
 binary: disjunction (|, "or"), conjunction (&, "and")
 #### Arithmetic functions
-unary: abs, ceil, floor, fac, logn, logd;
+unary: abs, round, ceil, floor, fac, logn, logd;
 binary: pow, exp;
 variadic: min, max
 #### Numeric constants
@@ -69,11 +69,13 @@ Scientific notation is supported, for example '1e2' for '100').
 
 Use method *parse* to parse expression string.
 If successful method returns NULL,
-otherwise it returns pointer to the position in the string where parser stopped.
+otherwise it returns pointer to the position in the string where the parser stopped.
 
-Use method *set* to set variable value. It returns reference to the *sentence* object for easy chaining.
+Use methods *set* to set variable value. It returns reference to the *sentence* object for easy chaining.
 
-Use methods *num* or *str* to evaluate expression as a number or a string accordingly.
+Use methods *evaluate* to evaluate expression as a number or a string.
+
+Use method *reset* to reset parser, and to remove all variables, user-defined constants and functions.
 
 Method *set* can be used before or after the *parse*.
 During the parsing any alphanumeric sequence not identified as

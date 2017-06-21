@@ -94,9 +94,9 @@ protected:
 	std::map<const char *, variant_value, identifier_comparator> _const_map;
 	std::map<const char *, variant_function, identifier_comparator> _func_map;
 	std::map<const char *, std::shared_ptr<variant_value>, identifier_comparator> _var_map;
-	std::vector<std::shared_ptr<std::vector<char>>> _str_vec;
+	std::map<const char *, std::shared_ptr<std::vector<char>>> _str_map;
 
-	const char * intern(const char * begin, const char * end);
+	const char * intern(const char * begin, const char * end = NULL);
 	variant_value * variable(const char* name);
 	state & next(state & s);
 	node * disj(state & s);

@@ -19,25 +19,25 @@ static inline bool alphanumeric(char c) { return alpha(c) || numeric(c); }
 
 static inline bool character(char c) { return c && c != '\"'; }
 
-static double func_or(const std::vector<Variant *> & vec)
+static double func_or(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num(), n1 = vec[1]->num();
 	return is_void(n) || is_void(n1) ? VOID_NUM : n != FALSE_NUM || n1 != FALSE_NUM ? TRUE_NUM : FALSE_NUM;
 }
 
-static double func_and(const std::vector<Variant *> & vec)
+static double func_and(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num(), n1 = vec[1]->num();
 	return is_void(n) || is_void(n1) ? VOID_NUM : n != FALSE_NUM && n1 != FALSE_NUM ? TRUE_NUM : FALSE_NUM;
 }
 
-static double func_not(const std::vector<Variant *> & vec)
+static double func_not(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num();
 	return is_void(n) ? VOID_NUM : n == FALSE_NUM ? TRUE_NUM : FALSE_NUM;
 }
 
-static double func_eq(const std::vector<Variant *> & vec)
+static double func_eq(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num();
 	if (is_void(n))
@@ -51,37 +51,37 @@ static double func_eq(const std::vector<Variant *> & vec)
 	return FALSE_NUM;
 }
 
-static double func_ne(const std::vector<Variant *> & vec)
+static double func_ne(const std::vector<variant *> & vec)
 {
 	double r = func_eq(vec);
 	return is_void(r) ? VOID_NUM : r == FALSE_NUM ? TRUE_NUM : FALSE_NUM;
 }
 
-static double func_gt(const std::vector<Variant *> & vec)
+static double func_gt(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num(), n1 = vec[1]->num();
 	return is_void(n) ? VOID_NUM : n > n1 ? TRUE_NUM : FALSE_NUM;
 }
 
-static double func_lt(const std::vector<Variant *> & vec)
+static double func_lt(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num(), n1 = vec[1]->num();
 	return is_void(n) ? VOID_NUM : n < n1 ? TRUE_NUM : FALSE_NUM;
 }
 
-static double func_ge(const std::vector<Variant *> & vec)
+static double func_ge(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num(), n1 = vec[1]->num();
 	return is_void(n) ? VOID_NUM : n >= n1 ? TRUE_NUM : FALSE_NUM;
 }
 
-static double func_le(const std::vector<Variant *> & vec)
+static double func_le(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num(), n1 = vec[1]->num();
 	return is_void(n) ? VOID_NUM : n <= n1 ? TRUE_NUM : FALSE_NUM;
 }
 
-static double func_match(const std::vector<Variant *> & vec)
+static double func_match(const std::vector<variant *> & vec)
 {
 	const char * s = vec[0]->str();
 	if (is_void(s))
@@ -95,13 +95,13 @@ static double func_match(const std::vector<Variant *> & vec)
 	return FALSE_NUM;
 }
 
-static double func_mismatch(const std::vector<Variant *> & vec)
+static double func_mismatch(const std::vector<variant *> & vec)
 {
 	double r = func_match(vec);
 	return is_void(r) ? VOID_NUM : r == FALSE_NUM ? TRUE_NUM : FALSE_NUM;
 }
 
-static double func_begin(const std::vector<Variant *> & vec)
+static double func_begin(const std::vector<variant *> & vec)
 {
 	const char * s = vec[0]->str();
 	if (is_void(s))
@@ -115,7 +115,7 @@ static double func_begin(const std::vector<Variant *> & vec)
 	return FALSE_NUM;
 }
 
-static double func_end(const std::vector<Variant *> & vec)
+static double func_end(const std::vector<variant *> & vec)
 {
 	const char * s = vec[0]->str();
 	if (is_void(s))
@@ -141,7 +141,7 @@ static double func_end(const std::vector<Variant *> & vec)
 	return FALSE_NUM;
 }
 
-static double func_part(const std::vector<Variant *> & vec)
+static double func_part(const std::vector<variant *> & vec)
 {
 	const char * s = vec[0]->str();
 	if (is_void(s))
@@ -155,26 +155,26 @@ static double func_part(const std::vector<Variant *> & vec)
 	return FALSE_NUM;
 }
 
-static double func_add(const std::vector<Variant *> & vec) { return vec[0]->num() + vec[1]->num(); }
+static double func_add(const std::vector<variant *> & vec) { return vec[0]->num() + vec[1]->num(); }
 
-static double func_sub(const std::vector<Variant *> & vec) { return vec[0]->num() - vec[1]->num(); }
+static double func_sub(const std::vector<variant *> & vec) { return vec[0]->num() - vec[1]->num(); }
 
-static double func_neg(const std::vector<Variant *> & vec) { return -vec[0]->num(); }
+static double func_neg(const std::vector<variant *> & vec) { return -vec[0]->num(); }
 
-static double func_mul(const std::vector<Variant *> & vec) { return vec[0]->num() * vec[1]->num(); }
+static double func_mul(const std::vector<variant *> & vec) { return vec[0]->num() * vec[1]->num(); }
 
-static double func_div(const std::vector<Variant *> & vec) { return vec[0]->num() / vec[1]->num(); }
+static double func_div(const std::vector<variant *> & vec) { return vec[0]->num() / vec[1]->num(); }
 
-static double func_mod(const std::vector<Variant *> & vec) { return fmod(vec[0]->num(), vec[1]->num()); }
+static double func_mod(const std::vector<variant *> & vec) { return fmod(vec[0]->num(), vec[1]->num()); }
 
-static const char * func_pos(const std::vector<Variant *> & vec)
+static const char * func_pos(const std::vector<variant *> & vec)
 {
 	const char * s = vec[0]->str();
 	double n = vec[1]->num();
 	return is_void(s) || is_void(n) || n >= strlen(s) ? VOID_STR : (s + (size_t)n);
 }
 
-static const char * func_first(const std::vector<Variant *> & vec)
+static const char * func_first(const std::vector<variant *> & vec)
 {
 	const char * s = vec[0]->str(), *si = vec[1]->str();
 	if (is_void(s) || is_void(si))
@@ -183,21 +183,27 @@ static const char * func_first(const std::vector<Variant *> & vec)
 	return str ? str : VOID_STR;
 }
 
-static double func_len(const std::vector<Variant *> & vec)
+static double func_len(const std::vector<variant *> & vec)
 {
 	const char * s = vec[0]->str();
 	return is_void(s) ? VOID_NUM : strlen(s);
 }
 
-static double func_abs(const std::vector<Variant *> & vec) { return fabs(vec[0]->num()); }
+static double func_abs(const std::vector<variant *> & vec) { return fabs(vec[0]->num()); }
 
-static double func_exp(const std::vector<Variant *> & vec) { return exp(vec[0]->num()); }
+static double func_ceil(const std::vector<variant *> & vec) { return ceil(vec[0]->num()); }
 
-static double func_logd(const std::vector<Variant *> & vec) { return log10(vec[0]->num()); }
+static double func_floor(const std::vector<variant *> & vec) { return floor(vec[0]->num()); }
 
-static double func_logn(const std::vector<Variant *> & vec) { return log(vec[0]->num()); }
+static double func_round(const std::vector<variant *> & vec) { return round(vec[0]->num()); }
 
-static double func_fac(const std::vector<Variant *> & vec)
+static double func_exp(const std::vector<variant *> & vec) { return exp(vec[0]->num()); }
+
+static double func_logd(const std::vector<variant *> & vec) { return log10(vec[0]->num()); }
+
+static double func_logn(const std::vector<variant *> & vec) { return log(vec[0]->num()); }
+
+static double func_fac(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num();
 	if (is_void(n) || n < 0.0 || n > 160)
@@ -209,7 +215,7 @@ static double func_fac(const std::vector<Variant *> & vec)
 	return result;
 }
 
-static double func_max(const std::vector<Variant *> & vec)
+static double func_max(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num();
 	if (is_void(n))
@@ -225,7 +231,7 @@ static double func_max(const std::vector<Variant *> & vec)
 	return n;
 }
 
-static double func_min(const std::vector<Variant *> & vec)
+static double func_min(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num();
 	if (is_void(n))
@@ -241,25 +247,25 @@ static double func_min(const std::vector<Variant *> & vec)
 	return n;
 }
 
-static double func_pow(const std::vector<Variant *> & vec)
+static double func_pow(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num(), n1 = vec[1]->num();
 	return is_void(n) || is_void(n1) ? VOID_NUM : pow(n, n1);
 }
 
-static double func_root(const std::vector<Variant *> & vec)
+static double func_root(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num(), n1 = vec[1]->num();
 	return is_void(n) || is_void(n1) || n1 == 0.0 ? VOID_NUM : pow(n, 1 / n1);
 }
 
-static double func_sqrt(const std::vector<Variant *> & vec)
+static double func_sqrt(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num();
 	return is_void(n) ? VOID_NUM : sqrt(vec[0]->num());
 }
 
-static double func_pct(const std::vector<Variant *> & vec)
+static double func_pct(const std::vector<variant *> & vec)
 {
 	double n = vec[0]->num(), n1 = vec[1]->num();
 	return is_void(n) || is_void(n1) || n1 == 0.0 ? VOID_NUM : n * 100 / n1;
@@ -340,10 +346,13 @@ sentence & sentence::reset()
 	_func_map.insert(std::make_pair("mul", variant_function(T_NUM_OPER, 2, func_mul)));
 	_func_map.insert(std::make_pair("div", variant_function(T_NUM_OPER, 2, func_div)));
 	_func_map.insert(std::make_pair("mod", variant_function(T_NUM_OPER, 2, func_mod)));
-	_func_map.insert(std::make_pair("pos", variant_function(T_STR_OPER, 1, func_pos)));
-	_func_map.insert(std::make_pair("first", variant_function(T_STR_OPER, 1, func_first)));
+	_func_map.insert(std::make_pair("pos", variant_function(T_STR_OPER, 2, func_pos)));
+	_func_map.insert(std::make_pair("first", variant_function(T_STR_OPER, 2, func_first)));
 	_func_map.insert(std::make_pair("len", variant_function(T_NUM_FUNC, 1, func_len)));
 	_func_map.insert(std::make_pair("abs", variant_function(T_NUM_FUNC, 1, func_abs)));
+	_func_map.insert(std::make_pair("ceil", variant_function(T_NUM_FUNC, 1, func_ceil)));
+	_func_map.insert(std::make_pair("floor", variant_function(T_NUM_FUNC, 1, func_floor)));
+	_func_map.insert(std::make_pair("round", variant_function(T_NUM_FUNC, 1, func_round)));
 	_func_map.insert(std::make_pair("exp", variant_function(T_NUM_FUNC, 1, func_exp)));
 	_func_map.insert(std::make_pair("fac", variant_function(T_NUM_FUNC, 1, func_fac)));
 	_func_map.insert(std::make_pair("logd", variant_function(T_NUM_FUNC, 1, func_logd)));

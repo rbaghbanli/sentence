@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <iostream>
 
-struct err_test { const char * expr; size_t idx; } err_tests[] =
+struct { const char * expr; size_t idx; } err_tests[] =
 {
 	{ "", 0 },
 	{ "(", 0 },
@@ -20,7 +20,7 @@ struct err_test { const char * expr; size_t idx; } err_tests[] =
 	{ "-1*(2+3", 6 },
 };
 
-struct num_test { const char * expr; double num; } num_tests[] =
+struct { const char * expr; double num; } num_tests[] =
 {
 	{ "-1", -1.0 },
 	{ "0", 0.0 },
@@ -42,19 +42,19 @@ struct num_test { const char * expr; double num; } num_tests[] =
 	{ "\"ab\"~\"abcd\"", 0.0 },
 	{ "\"abcd\"~\"abcd\"", 1.0 },
 	{ "\"abcd\"**\"abc----\"", 0.0 },
-	{ "\"abcd\"*~\"___abcd\"", 1.0 },
-	{ "\"abcd\"~*\"abcd----\"", 1.0 },
-	{ "\"abcd\"**\"___abcd----\"", 1.0 },
+	{ "\"abcd\"*~\"_abcdef__abcd\"", 1.0 },
+	{ "\"abcd\"~*\"abcd----abcd\"", 1.0 },
+	{ "\"abcd\"**\"___abcd----abc+++abcd\"", 1.0 },
 };
 
-struct str_test { const char * expr; const char * str; } str_tests[] =
+struct { const char * expr; const char * str; } str_tests[] =
 {
 	{ "\"abc\"", "abc" },
 	{ "\"abcd\"@2", "cd" },
 	{ "\"abcdef\"$\"bcd\"", "bcdef" },
 };
 
-struct num_var_test { const char * expr; double num; double ret; } num_var_tests[] =
+struct { const char * expr; double num; double ret; } num_n_tests[] =
 {
 	{ "n", 1, 1 },
 	{ "n = n", 2, 1 },
@@ -63,40 +63,53 @@ struct num_var_test { const char * expr; double num; double ret; } num_var_tests
 	{ "n >= 1,2,3", 6, 1 },
 };
 
-struct str_var_test { const char * expr; const char * str; const char * ret; } str_var_tests[] =
+struct { const char * expr; const char * str; double ret; } num_s_tests[] =
+{
+	{ "#s", "a", 1 },
+	{ "#(s@2)", "abcd", 2 },
+	{ "#\"abcd\" < #s", "abcde", 1 },
+	{ "#(s$\"abcdef\") / 6 > 10", "+-abcdef", 0 },
+};
+
+struct { const char * expr; const char * str; const char * ret; } str_s_tests[] =
 {
 	{ "s", "a", "a" },
 	{ "s@2", "abc", "c" },
-	{ "s@s", "abc", "abc" },
+	{ "\"aaaabc\"$s$\"abc\"", "abc", "abc" },
+};
+
+struct { const char * expr; double n1; double n2; const char * str; double ret; } num_nns_tests[] =
+{
+	{ "-sqrt(n1) + (n1+n2)/2 * #s", 4, 2, "a", 1 },
+	{ "-n1 - n2*#s + pow(n1, 2) / 2 + 2 = 0", 4, 2, "abc", 1 },
 };
 
 int main(int argc, char *argv[])
 {
 	sentence s;
 	std::string str;
+
 	for (auto t : err_tests)
-		printf("\nerror test %s - %s\n", t.expr, (s.parse(t.expr) - t.expr == t.idx) ? "SUCCESS" : "FAILURE");
+		printf("\nparse error test %s - %s\n", t.expr, (s.parse(t.expr) - t.expr == t.idx) ? "SUCCESS" : "FAILURE");
+
 	for (auto t : num_tests)
 		printf("\nnumber test %s - %s\n", t.expr, (s.parse(t.expr) == NULL && s.evaluate() == t.num) ? "SUCCESS" : "FAILURE");
+
 	for (auto t : str_tests)
 		printf("\nstring test %s - %s\n", t.expr, (s.parse(t.expr) == NULL && strcmp(s.evaluate(str), t.str) == 0) ? "SUCCESS" : "FAILURE");
-	for (auto t : num_var_tests)
-		printf("\nstring test %s - %s\n", t.expr, (s.parse(t.expr) == NULL && s.set("n", t.num).evaluate() == t.ret) ? "SUCCESS" : "FAILURE");
-	for (auto t : str_var_tests)
-		printf("\nstring test %s - %s\n", t.expr, (s.parse(t.expr) == NULL && strcmp(s.set("s", t.str).evaluate(str), t.ret) == 0) ? "SUCCESS" : "FAILURE");
+
+	for (auto t : num_n_tests)
+		printf("\nnumber from number variable test %s - %s\n", t.expr, (s.parse(t.expr) == NULL && s.set("n", t.num).evaluate() == t.ret) ? "SUCCESS" : "FAILURE");
+
+	for (auto t : str_s_tests)
+		printf("\nstring from string variable test %s - %s\n", t.expr, (s.parse(t.expr) == NULL && strcmp(s.set("s", t.str).evaluate(str), t.ret) == 0) ? "SUCCESS" : "FAILURE");
+
+	s.reset();
+
+	for (auto t : num_nns_tests)
+		printf("\nnumber from number+number+string variables test %s - %s\n", t.expr, (s.parse(t.expr) == NULL && s.set("n1", t.n1).set("n2", t.n2).set("s", t.str).evaluate() == t.ret) ? "SUCCESS" : "FAILURE");
+
 	printf("\npress enter to exit...");
 	std::cin.get();
 	return 0;
-
-	//const char * expr = "x + y/z - sqrt(z) + 200/10 + pow(x,2) > 0 & _a1_ ~* \"any string\",\"abcdef\"";
-	//const char * ret = s
-	//	.set("x", 5)
-	//	.set("y", 0.5)
-	//	.set("z", 3)
-	//	.set("_a1_", "abc")
-	//	.parse(expr);
-	//if (ret)
-	//	printf("\nfailed to parse expression at %s\n", ret);
-	//else
-	//	printf("\nexpression %s\n\tis evaluated to %f\n", expr, s.num());
 }
