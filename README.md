@@ -48,14 +48,14 @@ e, pi
 
 The expression parsing is performed using the following grammar:
 
-	<disj> = <conj>{"|"<conj>}
-	<conj> = <word>{"&"<word>}
-	<word> = {"!"}<comp>{("="|"!="|">"|">="|"<"|"<=")<comp>{","<comp>}}
-	<comp> = <term>{("+"|"-")<term>}
-	<term> = <fact>{("*"|"/"|"%")<fact>}
-	<fact> = {("-"|"+")}{"#"}<text>{(|"~"|"~*"|"*~"|"**")<text>{","<text>}}
-	<text> = <atom>{("@"|"$")<atom>
-	<atom> = (<number>|<string>|<variable>|<function>"("<disj>{","<disj>}")")
+	<disj> = {<disj>"|"}<conj>
+	<conj> = {<conj>"&"}<word>
+	<word> = {"!"}{<word>("="|"!="|">"|">="|"<"|"<=")}<comp>{","<comp>}
+	<comp> = {<comp>("+"|"-")}<term>
+	<term> = {<term>("*"|"/"|"%")}<fact>
+	<fact> = {("-"|"+")}{"#"}{<fact>(|"~"|"~*"|"*~"|"**")}<text>{","<text>}
+	<text> = {<text>("@"|"$")}<atom>
+	<atom> = <number>|<string>|<variable>|<function>"("<disj>{","<disj>}")"|"("<disj>")"
 
 Whitespace characters are ignored.
 
